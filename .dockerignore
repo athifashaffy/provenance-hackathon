@@ -1,0 +1,9 @@
+# Only the Dockerfile's COPY of aegis_deploy/ matters; keep the build context lean.
+**/__pycache__/
+**/*.pyc
+**/*.db
+.git/
+node_modules/
+*.apk
+*.aab
+.DS_Store

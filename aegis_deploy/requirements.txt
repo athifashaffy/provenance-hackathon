@@ -1,0 +1,8 @@
+fastapi==0.115.5
+a2wsgi==1.10.7
+aiosqlite==0.20.0
+cryptography==43.0.3
+pydantic==2.10.3
+python-multipart==0.0.12
+qrcode[pil]==8.0
+Pillow==11.0.0

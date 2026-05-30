@@ -5,7 +5,7 @@
 
 import { useMemo } from 'react';
 import ReactFlow, {
-  Background, Controls, MiniMap, Handle, Position, MarkerType,
+  Background, Controls, Handle, Position, MarkerType,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -179,14 +179,6 @@ export default function FlowGraph({ atts, leafId, anomalies = [] }) {
         >
           <Background color="#c7d0e6" gap={20} />
           <Controls showInteractive={false} />
-          <MiniMap
-            pannable
-            zoomable
-            nodeStrokeWidth={3}
-            nodeColor={(n) => n.data?.flags?.length ? '#d83434'
-              : n.data?.isLeaf ? '#1f3a8a'
-              : n.data?.att?.performed_in_country === 'CA' ? '#1f6b4f' : '#c7d0e6'}
-          />
         </ReactFlow>
       </div>
     </div>

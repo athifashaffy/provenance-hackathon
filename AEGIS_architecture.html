@@ -10,14 +10,15 @@
     --bg:#eef1f7;--card:#fff;--muted:#5b6b8c;--line:#c7d0e6;
     --green:#1f6b4f;--amber:#b9842b;--violet:#6b4fb0;--teal:#1f7d8c;
   }
-  @page{size:1280px 1030px;margin:0;}
+  @page{size:1280px 982px;margin:0;}
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);font-family:'Inter',sans-serif;color:var(--ink);}
-  .stage{width:1280px;height:1030px;position:relative;padding:26px 38px 24px;background:linear-gradient(180deg,#f4f6fb,#e9edf6);overflow:hidden;}
+  .stage{width:1280px;height:982px;position:relative;padding:26px 38px 24px;background:linear-gradient(180deg,#f4f6fb,#e9edf6);overflow:hidden;}
   .logo{position:absolute;top:24px;right:38px;font-family:'Rajdhani';font-weight:700;color:var(--blue);font-size:18px;border:2px solid var(--blue);border-radius:50%/60%;padding:2px 13px;}
   .hd{text-align:center;}
   .hd h1{font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--blue);font-size:36px;text-transform:uppercase;letter-spacing:.03em;}
-  .hd p{color:var(--muted);font-size:14px;margin-top:3px;}
+  .hd .accent{width:78px;height:4px;border-radius:3px;margin:7px auto 0;background:linear-gradient(90deg,var(--blue),var(--teal));}
+  .hd p{color:var(--muted);font-size:14px;margin-top:8px;}
 
   .band{margin-top:16px;position:relative;}
   .bandlab{font-family:'Rajdhani';font-weight:700;letter-spacing:.12em;font-size:12px;text-transform:uppercase;color:var(--muted);margin:0 0 8px 2px;display:flex;align-items:center;gap:9px;}
@@ -61,12 +62,18 @@
   .tbl .role{font-size:11px;font-weight:700;color:var(--ink);margin-top:6px;}
   .tbl p{font-size:11px;color:var(--muted);line-height:1.4;margin-top:4px;}
 
-  .deploybar{display:flex;gap:10px;justify-content:center;margin-top:14px;}
-  .pill{font-size:12px;background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:5px 14px;color:var(--muted);}
+  /* flow spine */
+  .arr{position:relative;height:30px;text-align:center;}
+  .arr::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;transform:translateX(-50%);background:linear-gradient(var(--line),var(--blue));}
+  .arr span{position:relative;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;margin-top:3px;border-radius:50%;background:#fff;border:2px solid var(--blue);color:var(--blue);font-size:13px;font-weight:700;box-shadow:0 2px 6px rgba(47,79,176,.18);}
+
+  /* footer band */
+  .footerband{margin-top:16px;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:13px 18px;box-shadow:0 4px 16px rgba(31,58,138,.06);}
+  .deploybar{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .pill{font-size:12px;background:var(--bg);border:1.5px solid var(--line);border-radius:20px;padding:5px 14px;color:var(--muted);}
   .pill b{color:var(--ink);}
-  .arr{text-align:center;color:var(--blue);font-size:20px;font-weight:700;margin:3px 0 -1px;}
-  .foot{margin-top:14px;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;}
-  .foot .rule{flex:1;height:1px;background:var(--line);margin:0 16px;}
+  .foot{margin-top:11px;padding-top:11px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;}
+  .foot .brand{font-family:'Rajdhani';font-weight:700;color:var(--blue);letter-spacing:.04em;}
 </style>
 </head>
 <body>
@@ -74,6 +81,7 @@
   <div class="logo">TAN</div>
   <div class="hd">
     <h1>AEGIS — How It Works</h1>
+    <div class="accent"></div>
     <p>Proving where a product really comes from — from the factory floor to the buyer's phone</p>
   </div>
 
@@ -87,7 +95,7 @@
     </div>
   </div>
 
-  <div class="arr">↓</div>
+  <div class="arr"><span>↓</span></div>
 
   <!-- ② APP -->
   <div class="band">
@@ -99,7 +107,7 @@
     </div>
   </div>
 
-  <div class="arr">↓</div>
+  <div class="arr"><span>↓</span></div>
 
   <!-- ③ ENGINES -->
   <div class="band">
@@ -132,7 +140,7 @@
     </div>
   </div>
 
-  <div class="arr">↓</div>
+  <div class="arr"><span>↓</span></div>
 
   <!-- ④ DATABASE -->
   <div class="band">
@@ -164,13 +172,14 @@
     </div>
   </div>
 
-  <div class="deploybar">
-    <span class="pill"><b>Web app</b> for suppliers</span>
-    <span class="pill"><b>AEGIS Scan</b> phone app for buyers</span>
-    <span class="pill"><b>One service</b> + a single PostgreSQL database</span>
+  <div class="footerband">
+    <div class="deploybar">
+      <span class="pill"><b>Web app</b> for suppliers</span>
+      <span class="pill"><b>AEGIS Scan</b> phone app for buyers</span>
+      <span class="pill"><b>One service</b> + a single PostgreSQL database</span>
+    </div>
+    <div class="foot"><span class="brand">THE ALPHA NOVA · AEGIS</span><span>www.thealphanova.com</span></div>
   </div>
-
-  <div class="foot"><span>www.thealphanova.com</span><span class="rule"></span><span>The Alpha Nova · AEGIS</span></div>
 </div>
 </body>
 </html>

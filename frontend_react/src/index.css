@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply text-aegis-ink font-sans antialiased;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(47,79,176,0.08), transparent 60%),
+      radial-gradient(900px 500px at -10% 20%, rgba(31,107,79,0.06), transparent 55%),
+      #eef1f7;
+    min-height: 100vh;
+  }
+  h1, h2, h3 { @apply font-display; }
+  ::selection { background: rgba(47,79,176,0.18); }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl p-6;
+    border: 1px solid rgba(199,208,230,0.7);
+    box-shadow: 0 1px 2px rgba(22,33,62,0.04), 0 8px 24px rgba(22,33,62,0.05);
+  }
+  .card-flat { @apply bg-white rounded-2xl p-6 border border-aegis-line; }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-xl px-4 py-2.5 text-sm transition-all cursor-pointer select-none;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { @apply text-white; background: linear-gradient(135deg, #2f4fb0, #1f3a8a); box-shadow: 0 4px 14px rgba(47,79,176,0.3); }
+  .btn-primary:hover { box-shadow: 0 6px 20px rgba(47,79,176,0.4); }
+  .btn-outline { @apply border text-aegis-blue bg-white; border-color: rgba(199,208,230,0.9); }
+  .btn-outline:hover { @apply bg-aegis-bg; border-color: #2f4fb0; }
+  .btn-success { @apply text-white; background: linear-gradient(135deg, #1f6b4f, #155c43); box-shadow: 0 4px 14px rgba(31,107,79,0.3); }
+  .btn-ghost { @apply text-aegis-muted hover:text-aegis-blue; }
+  .btn:disabled { @apply opacity-50 cursor-not-allowed; }
+
+  .label { @apply block text-[0.7rem] font-semibold uppercase tracking-wider text-aegis-muted mb-1.5; }
+  .input {
+    @apply w-full rounded-xl px-3.5 py-2.5 text-sm bg-white transition;
+    border: 1px solid rgba(199,208,230,0.9);
+  }
+  .input:focus { @apply outline-none; border-color: #2f4fb0; box-shadow: 0 0 0 3px rgba(47,79,176,0.12); }
+  .badge { @apply inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full; }
+  .mono { @apply font-mono; }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border transition cursor-pointer;
+    border-color: rgba(199,208,230,0.9);
+  }
+  .chip-on { @apply bg-aegis-blue text-white; border-color: #2f4fb0; }
+
+  .otp-input {
+    @apply w-12 h-14 text-center text-2xl font-display font-bold rounded-xl bg-white;
+    border: 1px solid rgba(199,208,230,0.9);
+  }
+  .otp-input:focus { @apply outline-none; border-color: #2f4fb0; box-shadow: 0 0 0 3px rgba(47,79,176,0.12); }
+}

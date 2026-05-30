@@ -1,0 +1,39 @@
+# AEGIS — one backend container serves both the scored /verify API and the
+# built React SPA (frontend_react → backend/static). Single port :8000.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: supplychain
+      POSTGRES_USER: scuser
+      POSTGRES_PASSWORD: scpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scuser -d supplychain"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    labels:
+      com.aegis.role: database
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://scuser:scpass@db:5432/supplychain
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    labels:
+      com.aegis.role: backend
+      com.aegis.description: "FastAPI — /verify engine + React SPA (one container, :8000)"
+
+volumes:
+  pgdata:

@@ -61,6 +61,14 @@ async def startup():
     # Store on app.state so the integrity middleware can access it
     app.state.pool = pool
     await init_schema(pool)
+    # Re-publish the fixed demo products (stable ids) so printed QR codes keep
+    # resolving even after an ephemeral Cloud Run instance recycles.
+    try:
+        from demo_seed import seed_demo_products
+        n = await seed_demo_products(pool)
+        print(f"[startup] seeded {n} demo products")
+    except Exception as e:  # never let seeding break startup
+        print(f"[startup] demo seed skipped: {e}")
 
 
 # ── Dependency ────────────────────────────────────────────────────────────────

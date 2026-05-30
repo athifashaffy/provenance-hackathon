@@ -1,1 +1,23 @@
+# Python
 __pycache__/
+*.pyc
+
+# Node / frontend
+node_modules/
+dist/
+test-results/
+playwright-report/
+
+# Flutter / Dart (mobile/)
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+*.apk
+*.aab
+
+# Teammate's separate backend — not part of this submission repo
+backend-cheick/
+
+# OS
+.DS_Store

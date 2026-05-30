@@ -1,0 +1,44 @@
+{
+  "branchName": "ralph/verify-score",
+  "title": "Maximize provenance /verify score without overfitting",
+  "backend": "backend/verify.py",
+  "grader": "python3 self_test.py http://localhost:8000/verify",
+  "guardrails": {
+    "self_test_overall_min": 98.5,
+    "clean_category_must_be": 100.0,
+    "cv_heldout_clean_fp_chains_max_pct": 1.0,
+    "golden_test": "python3 -m reference_lib.tests.test_golden"
+  },
+  "stories": [
+    {
+      "id": "S0",
+      "title": "Establish a reproducible scoring + CV harness",
+      "detail": "Stand up backend on :8000, run self_test, and run scripts/ralph/cv_check.py to record baseline self_test % and held-out clean-FP %. No code change to verify.py.",
+      "passes": true
+    },
+    {
+      "id": "S1",
+      "title": "t4_labour_outlier: raise recall, keep CV clean-FP < 1%",
+      "detail": "Improve labour-hours outlier detection (per-(name,action) generalizable signal) above the current 78.6% WITHOUT raising held-out clean FP. Verify with cv_check.py.",
+      "passes": false
+    },
+    {
+      "id": "S2",
+      "title": "t4_cost_outlier: raise recall, keep CV clean-FP < 1%",
+      "detail": "Improve labour-rate / cost outlier detection above 52.9% using only signals that survive 5-seed CV with ~0 held-out clean FP. Reject any rule that overfits.",
+      "passes": false
+    },
+    {
+      "id": "S3",
+      "title": "t4_origin_outlier: catch the (supplier,material) CA-rare case if generalizable",
+      "detail": "Investigate the one missed origin case (sup-0009/DP110). If a (supplier,material) origin signal generalizes (CV clean-FP ~0), add it; otherwise document it as inseparable and leave at 97.4%.",
+      "passes": false
+    },
+    {
+      "id": "S4",
+      "title": "Final guard: confirm no regression and document the honest ceiling",
+      "detail": "Re-run self_test + cv_check + golden tests. Record final numbers and the evidence that any uncaught T4 nodes are statistically identical to clean data. Emit <promise>COMPLETE</promise>.",
+      "passes": false
+    }
+  ]
+}

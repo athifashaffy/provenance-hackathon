@@ -1,4 +1,4 @@
-import ChainGraph from './ChainGraph.jsx';
+import FlowGraph from './FlowGraph.jsx';
 import { categorize } from '../lib/categories.js';
 
 const STATUS = {
@@ -84,7 +84,7 @@ export default function Verdict({ result, chain }) {
         </div>
       </div>
 
-      {atts.length > 0 && <ChainGraph atts={atts} leafId={chain?.product_attestation_id} />}
+      {atts.length > 0 && <FlowGraph atts={atts} leafId={chain?.product_attestation_id} anomalies={all} />}
 
       {atts.length > 0 && (
         <div className="card">

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEGIS — Supplier Wallet</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <script src="demo-data.js"></script>
+  <script src="aegis-wallet.js"></script>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">
+    <div class="logo-mark"><img src="drone-logo.png" alt="AEGIS"></div>
+    <div><div class="logo-text">AEGIS</div><div class="logo-sub">Supplier Wallet</div></div>
+  </a>
+  <nav>
+    <a href="index.html">Dashboard</a>
+    <a href="supplier.html" class="active">Supplier</a>
+    <a href="purchaser.html">Purchaser</a>
+  </nav>
+</header>
+
+<div class="container">
+
+  <!-- ===== LOGIN ===== -->
+  <div id="login-view">
+    <div class="page-title">Supplier Wallet Login</div>
+    <div class="page-sub">Authenticate with your enterprise signing key. Your private key never leaves this device — login is proven by a local signature challenge.</div>
+
+    <div class="card" style="max-width:620px;">
+      <div class="card-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--tan-navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Sign in
+      </div>
+
+      <div class="form-group">
+        <label>Supplier ID</label>
+        <input id="login-id" placeholder="sup-avss-corp" autocomplete="off" />
+      </div>
+      <div class="form-group">
+        <label>Private signing key (base64)</label>
+        <input id="login-key" placeholder="base64 Ed25519 private key" autocomplete="off"
+               style="font-family:monospace;font-size:.8rem;" />
+      </div>
+      <button class="btn btn-primary btn-block" onclick="login()">Unlock wallet</button>
+      <div id="login-result" style="margin-top:1rem;"></div>
+
+      <div style="margin-top:1.4rem;border-top:1px solid var(--tan-border);padding-top:1rem;">
+        <label style="font-weight:600;color:var(--tan-gray);font-size:.85rem;">Demo identities (one-click)</label>
+        <div id="demo-logins" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== WALLET (post-login) ===== -->
+  <div id="wallet-view" style="display:none;">
+    <div id="identity-bar"></div>
+
+    <!-- Build & sign attestation -->
+    <div class="card">
+      <div class="card-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--tan-navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Issue a signed attestation
+      </div>
+
+      <div class="form-row">
+        <div class="form-group"><label>Output name</label><input id="f-name" placeholder="Parachute Recovery Assembly" /></div>
+        <div class="form-group"><label>Action type</label>
+          <select id="f-action">
+            <option value="raw_material_supply">raw_material_supply</option>
+            <option value="component_manufacture" selected>component_manufacture</option>
+            <option value="subassembly">subassembly</option>
+            <option value="final_integration">final_integration</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group"><label>Performed in country</label>
+          <select id="f-country">
+            <option value="CA" selected>Canada (CA)</option>
+            <option value="US">United States (US)</option>
+            <option value="CN">China (CN)</option>
+            <option value="FR">France (FR)</option>
+            <option value="DE">Germany (DE)</option>
+            <option value="GB">United Kingdom (GB)</option>
+            <option value="JP">Japan (JP)</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Output quantity</label><input id="f-qty" type="number" value="1" min="0" /></div>
+        <div class="form-group"><label>Output unit</label><input id="f-unit" value="units" /></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group"><label>Material cost (CAD)</label><input id="f-mat" type="number" value="0" min="0" step="0.01" /></div>
+        <div class="form-group"><label>Labour hours</label><input id="f-hrs" type="number" value="6.5" min="0" step="0.1" /></div>
+        <div class="form-group"><label>Labour cost (CAD)</label><input id="f-lab" type="number" value="520" min="0" step="0.01" /></div>
+      </div>
+
+      <div class="form-group">
+        <label>Parents (inputs consumed)</label>
+        <div id="parents-list"></div>
+        <button class="btn btn-outline" style="margin-top:.5rem;padding:.35rem .8rem;font-size:.8rem;" onclick="addParent()">+ Add parent input</button>
+        <p style="font-size:.78rem;color:var(--tan-gray);margin-top:.4rem;">Paste an upstream attestation ID + content hash, or leave empty for raw materials.</p>
+      </div>
+
+      <button class="btn btn-primary" onclick="signAttestation()">Sign attestation</button>
+      <div id="sign-result" style="margin-top:1rem;"></div>
+    </div>
+
+    <!-- Issued this session -->
+    <div class="card">
+      <div class="card-title">Attestations issued this session</div>
+      <div id="issued-list"><p style="color:var(--tan-gray);font-size:.9rem;">None yet — sign one above.</p></div>
+      <div id="issued-actions" style="display:none;margin-top:1rem;">
+        <button class="btn btn-success" onclick="verifyMyChain()">Verify my chain via /verify →</button>
+        <p style="font-size:.78rem;color:var(--tan-gray);margin-top:.4rem;">Treats your latest signed attestation as the product leaf and submits the whole set to the AEGIS engine.</p>
+      </div>
+      <div id="verify-result" style="margin-top:1rem;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = window.API_BASE_URL || 'http://localhost:8000';
+const DEMO = window.AEGIS_DEMO || { registry:{}, demoLogins:[], samples:[] };
+const W = window.AegisWallet;
+let wallet = null;          // { supplier_id, priv, pub, name, country }
+let issued = [];            // attestations signed this session
+
+function esc(s){const d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;}
+
+// ---- demo login buttons ----
+function renderDemoLogins(){
+  document.getElementById('demo-logins').innerHTML = DEMO.demoLogins.map((d,i)=>
+    `<button class="btn btn-outline" style="padding:.4rem .8rem;font-size:.8rem;text-align:left;" onclick="quickLogin(${i})">${esc(d.name)}<br><span class="mono" style="font-size:.7rem;color:var(--tan-gray)">${esc(d.supplier_id)}</span></button>`
+  ).join('');
+}
+function quickLogin(i){
+  const d = DEMO.demoLogins[i];
+  document.getElementById('login-id').value = d.supplier_id;
+  document.getElementById('login-key').value = d.priv;
+  login();
+}
+
+// ---- login: verify the key matches the registry public key, fully client-side ----
+async function login(){
+  const id = document.getElementById('login-id').value.trim();
+  const key = document.getElementById('login-key').value.trim();
+  const out = document.getElementById('login-result');
+  if(!id || !key){ out.innerHTML = alertBox('Enter both supplier ID and private key.','danger'); return; }
+  const regPub = DEMO.registry[id];
+  if(!regPub){ out.innerHTML = alertBox('Supplier ID not found in the verified registry.','danger'); return; }
+  out.innerHTML = spinner('Verifying key against registry…');
+  let derived;
+  try { derived = await W.pubFromPriv(key); }
+  catch(e){ out.innerHTML = alertBox('Invalid key format (need a base64 Ed25519 private key). '+e.message,'danger'); return; }
+  if(derived !== regPub){ out.innerHTML = alertBox('Key does not match the public key registered for '+id+'.','danger'); return; }
+
+  const meta = DEMO.demoLogins.find(d=>d.supplier_id===id) || {};
+  wallet = { supplier_id:id, priv:key, pub:regPub, name:meta.name||id, country:meta.country||'' };
+  showWallet();
+}
+
+function showWallet(){
+  document.getElementById('login-view').style.display='none';
+  document.getElementById('wallet-view').style.display='block';
+  document.getElementById('identity-bar').innerHTML = `
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+      <div>
+        <div style="font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--tan-gray);">Authenticated wallet</div>
+        <div style="font-size:1.3rem;font-weight:700;color:var(--tan-navy);">${esc(wallet.name)}</div>
+        <div class="mono" style="font-size:.8rem;color:var(--tan-gray);">${esc(wallet.supplier_id)} · key verified ✓</div>
+      </div>
+      <button class="btn btn-outline" onclick="logout()">Sign out</button>
+    </div>`;
+  if(!document.querySelector('#parents-list .input-item')) addParent();
+}
+function logout(){ wallet=null; issued=[]; document.getElementById('login-view').style.display='block'; document.getElementById('wallet-view').style.display='none'; document.getElementById('login-result').innerHTML=''; document.getElementById('login-key').value=''; }
+
+// ---- parents ----
+function addParent(){
+  const list = document.getElementById('parents-list');
+  const div = document.createElement('div');
+  div.className='input-item';
+  div.style.cssText='display:grid;grid-template-columns:1fr 1fr 90px 70px 32px;gap:.4rem;margin-bottom:.4rem;';
+  div.innerHTML = `
+    <input placeholder="parent attestation_id" class="p-id" />
+    <input placeholder="content_hash" class="p-hash mono" style="font-size:.72rem;" />
+    <input placeholder="qty" type="number" class="p-qty" value="1" min="0" />
+    <input placeholder="unit" class="p-unit" value="units" />
+    <button class="remove-btn" onclick="this.parentElement.remove()">×</button>`;
+  list.appendChild(div);
+}
+
+function fnum(v){ const n=parseFloat(v); return isNaN(n)?0:n; }
+
+// ---- build + sign the attestation in the REAL spec schema ----
+async function signAttestation(){
+  if(!wallet){ return; }
+  const out = document.getElementById('sign-result');
+  const parents = [];
+  document.querySelectorAll('#parents-list .input-item').forEach(row=>{
+    const id=row.querySelector('.p-id').value.trim();
+    if(!id) return;
+    parents.push({
+      attestation_id:id,
+      content_hash:row.querySelector('.p-hash').value.trim(),
+      quantity_consumed:fnum(row.querySelector('.p-qty').value),
+      unit:row.querySelector('.p-unit').value.trim()||'units'
+    });
+  });
+  const rid = 'att-'+crypto.randomUUID();
+  const action = document.getElementById('f-action').value;
+  // canonical time-of-day convention from the genuine corpus: raw materials at
+  // 09:00:00Z, transformations at 14:30:00Z (today's date)
+  const day = new Date().toISOString().slice(0,10);
+  const tod = action === 'raw_material_supply' ? '09:00:00Z' : '14:30:00Z';
+  const att = {
+    attestation_id: rid,
+    version: '1.0',
+    supplier_id: wallet.supplier_id,
+    timestamp: day + 'T' + tod,
+    action_type: action,
+    performed_in_country: document.getElementById('f-country').value,
+    parents: parents,
+    output: {
+      name: document.getElementById('f-name').value.trim()||'Output',
+      quantity_produced: fnum(document.getElementById('f-qty').value),
+      unit: document.getElementById('f-unit').value.trim()||'units'
+    },
+    costs: {
+      material_cad: fnum(document.getElementById('f-mat').value),
+      labour_hours: fnum(document.getElementById('f-hrs').value),
+      labour_cost_cad: fnum(document.getElementById('f-lab').value)
+    }
+  };
+  out.innerHTML = spinner('Signing with your wallet key…');
+  try{
+    const signed = await W.sign(att, wallet.priv);
+    const hash = await W.contentHash(signed);
+    signed._content_hash = hash;
+    issued.push(signed);
+    out.innerHTML = alertBox(
+      '<strong>Attestation signed.</strong><br>'+
+      'ID: <span class="mono" data-testid="last-att-id">'+esc(rid)+'</span><br>'+
+      'content_hash: <span class="mono" style="font-size:.72rem;">'+esc(hash)+'</span><br>'+
+      'signature: <span class="mono" style="font-size:.72rem;">'+esc(signed.signature.value.slice(0,32))+'…</span>',
+      'success', true);
+    renderIssued();
+  }catch(e){ out.innerHTML = alertBox('Signing failed: '+e.message,'danger'); }
+}
+
+function renderIssued(){
+  const wrap = document.getElementById('issued-list');
+  if(!issued.length){ wrap.innerHTML='<p style="color:var(--tan-gray);font-size:.9rem;">None yet.</p>'; return; }
+  wrap.innerHTML = `<table><thead><tr><th>Output</th><th>Action</th><th>Country</th><th>ID</th></tr></thead><tbody>`+
+    issued.map(a=>`<tr><td>${esc(a.output.name)}</td><td><span class="mono" style="font-size:.75rem;">${esc(a.action_type)}</span></td>
+      <td>${esc(a.performed_in_country)}</td><td><span class="mono">${esc(a.attestation_id.slice(0,14))}…</span></td></tr>`).join('')+
+    `</tbody></table>`;
+  document.getElementById('issued-actions').style.display='block';
+}
+
+// ---- verify the issued set through the scored engine ----
+async function verifyMyChain(){
+  const out = document.getElementById('verify-result');
+  if(!issued.length) return;
+  const leaf = issued[issued.length-1];
+  const clean = issued.map(a=>{const c={...a}; delete c._content_hash; return c;});
+  out.innerHTML = spinner('Submitting to AEGIS /verify…');
+  try{
+    const r = await fetch(API+'/verify',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({product_attestation_id:leaf.attestation_id, attestations:clean})});
+    const data = await r.json();
+    out.innerHTML = verdictBox(data);
+  }catch(e){ out.innerHTML = alertBox('Verify failed: '+e.message,'danger'); }
+}
+
+// ---- small UI helpers ----
+function spinner(t){ return '<span class="spinner"></span> '+esc(t); }
+function alertBox(html,type,raw){ return '<div class="alert alert-'+type+'" data-testid="alert">'+(raw?html:esc(html))+'</div>'; }
+function verdictBox(d){
+  const cls = d.designation==='product_of_canada'?'success':d.designation==='made_in_canada'?'info':'warning';
+  const valid = d.chain_valid;
+  const all = d.anomalies||[];
+  const hard = all.filter(a=>a.type!=='statistical_outlier');
+  const soft = all.filter(a=>a.type==='statistical_outlier');
+  let html = `<div class="alert alert-${valid?'success':'danger'}" data-testid="verdict" style="margin-bottom:.6rem;">
+      Chain ${valid?'VERIFIED ✓':'INVALID ✗'} — ${hard.length} integrity violation(s)</div>
+    <div class="alert alert-${cls}">
+      <strong>${esc((d.designation||'none').replace(/_/g,' ').toUpperCase())}</strong> ·
+      ${Number(d.canadian_content_percentage).toFixed(1)}% Canadian content</div>`;
+  if(hard.length) html += '<div style="margin-top:.6rem;">'+hard.map(a=>
+      `<div class="anomaly-item"><span class="anomaly-type">${esc(a.type)}</span> <span class="mono" style="font-size:.72rem;">${esc((a.attestation_id||'').slice(0,14))}…</span><br><span style="font-size:.8rem;color:var(--tan-gray);">${esc(a.details||'')}</span></div>`
+    ).join('')+'</div>';
+  if(soft.length) html += `<div class="alert alert-warning" style="margin-top:.6rem;font-size:.85rem;">${soft.length} statistical signal(s) flagged for review (legal, but unusual vs. genuine chains).</div>`;
+  return html;
+}
+
+renderDemoLogins();
+</script>
+</body>
+</html>

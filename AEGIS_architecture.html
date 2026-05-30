@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AEGIS — Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#2f4fb0;--blue-deep:#1f3a8a;--ink:#16213e;--red:#d83434;
+    --bg:#eef1f7;--card:#fff;--muted:#5b6b8c;--line:#c7d0e6;
+    --green:#1f6b4f;--amber:#b9842b;--violet:#6b4fb0;--teal:#1f7d8c;
+  }
+  @page{size:1280px 1030px;margin:0;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);font-family:'Inter',sans-serif;color:var(--ink);}
+  .stage{width:1280px;height:1030px;position:relative;padding:26px 38px 24px;background:linear-gradient(180deg,#f4f6fb,#e9edf6);overflow:hidden;}
+  .logo{position:absolute;top:24px;right:38px;font-family:'Rajdhani';font-weight:700;color:var(--blue);font-size:18px;border:2px solid var(--blue);border-radius:50%/60%;padding:2px 13px;}
+  .hd{text-align:center;}
+  .hd h1{font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--blue);font-size:36px;text-transform:uppercase;letter-spacing:.03em;}
+  .hd p{color:var(--muted);font-size:14px;margin-top:3px;}
+
+  .band{margin-top:16px;position:relative;}
+  .bandlab{font-family:'Rajdhani';font-weight:700;letter-spacing:.12em;font-size:12px;text-transform:uppercase;color:var(--muted);margin:0 0 8px 2px;display:flex;align-items:center;gap:9px;}
+  .bandlab .num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;}
+  .row{display:flex;gap:14px;align-items:stretch;}
+  .box{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:12px 14px;flex:1;}
+  .box h3{font-family:'Rajdhani';font-weight:700;font-size:16px;color:var(--blue-deep);display:flex;align-items:center;gap:8px;}
+  .box p{font-size:12px;color:var(--muted);line-height:1.4;margin-top:5px;}
+  .ico{font-size:16px;}
+
+  /* engines */
+  .engines{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .engine{background:#fff;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;}
+  .engine.a{border:2.5px solid var(--blue);box-shadow:0 6px 20px rgba(47,79,176,.10);}
+  .engine.b{border:2.5px solid var(--teal);box-shadow:0 6px 20px rgba(31,125,140,.10);}
+  .etitle{font-family:'Rajdhani';font-weight:700;font-size:19px;text-align:center;}
+  .engine.a .etitle{color:var(--blue);}
+  .engine.b .etitle{color:var(--teal);}
+  .esub{font-size:11.5px;text-align:center;margin-top:2px;color:var(--muted);}
+  .pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px;}
+  .step{background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:9px 7px;text-align:center;}
+  .step .n{font-family:'Rajdhani';font-weight:700;color:var(--blue);font-size:13px;}
+  .step h4{font-size:12px;font-weight:700;color:var(--ink);margin-top:2px;}
+  .step p{font-size:10px;color:var(--muted);line-height:1.3;margin-top:3px;}
+  .note{margin-top:12px;border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.45;}
+  .note.a{background:#fbf3f3;border:1.5px solid #eccaca;color:#9a3030;}
+  .note.b{background:#eff7f8;border:1.5px solid #bfe0e4;color:var(--teal);}
+  .note b{font-weight:700;}
+  .out{margin-top:auto;padding-top:12px;}
+  .outbar{border-radius:10px;padding:9px 11px;font-size:12px;font-weight:600;text-align:center;line-height:1.45;}
+  .engine.a .outbar{background:#f2f8f4;border:1.5px solid #bfe0cd;color:var(--green);}
+  .engine.b .outbar{background:#eff7f8;border:1.5px solid #bfe0e4;color:var(--teal);}
+
+  /* DB */
+  .dbcard{background:#fff;border:2.5px solid var(--violet);border-radius:14px;padding:14px 16px;box-shadow:0 6px 20px rgba(107,79,176,.10);}
+  .dbhead{font-family:'Rajdhani';font-weight:700;font-size:17px;color:var(--violet);display:flex;align-items:center;gap:9px;}
+  .dbhead .badge{margin-left:auto;font-size:11px;font-weight:600;color:#fff;background:var(--violet);border-radius:7px;padding:3px 11px;}
+  .tables{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px;}
+  .tbl{background:#faf9ff;border:1.5px solid #d8d0ef;border-radius:11px;padding:11px 13px;}
+  .tbl .tn{font-family:'Rajdhani';font-weight:700;font-size:15px;color:var(--violet);display:flex;align-items:center;gap:7px;}
+  .tbl .role{font-size:11px;font-weight:700;color:var(--ink);margin-top:6px;}
+  .tbl p{font-size:11px;color:var(--muted);line-height:1.4;margin-top:4px;}
+
+  .deploybar{display:flex;gap:10px;justify-content:center;margin-top:14px;}
+  .pill{font-size:12px;background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:5px 14px;color:var(--muted);}
+  .pill b{color:var(--ink);}
+  .arr{text-align:center;color:var(--blue);font-size:20px;font-weight:700;margin:3px 0 -1px;}
+  .foot{margin-top:14px;display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;}
+  .foot .rule{flex:1;height:1px;background:var(--line);margin:0 16px;}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="logo">TAN</div>
+  <div class="hd">
+    <h1>AEGIS — How It Works</h1>
+    <p>Proving where a product really comes from — from the factory floor to the buyer's phone</p>
+  </div>
+
+  <!-- ① PEOPLE -->
+  <div class="band">
+    <div class="bandlab"><span class="num">1</span>The people</div>
+    <div class="row">
+      <div class="box"><h3><span class="ico">🏭</span>Suppliers · web app</h3><p>Every company in the chain signs off on its own step — what it made, where the work was done, and what it cost — using a secure digital signature.</p></div>
+      <div class="box"><h3><span class="ico">🔗</span>The chain</h3><p>Each step is locked to the steps before it, so the whole history of a product is tamper-evident — change one link and it shows.</p></div>
+      <div class="box" style="border-color:var(--teal)"><h3><span class="ico">📱</span>Buyers · phone app</h3><p>The <b>AEGIS Scan</b> mobile app points the phone camera at the product's QR code and instantly shows where it's really from — no typing, no login.</p></div>
+    </div>
+  </div>
+
+  <div class="arr">↓</div>
+
+  <!-- ② APP -->
+  <div class="band">
+    <div class="bandlab"><span class="num">2</span>The application</div>
+    <div class="row">
+      <div class="box" style="border-color:var(--blue)"><h3><span class="ico">🛡️</span>Security gate</h3><p>Before anything is saved, AEGIS checks the signature is genuine and the supplier is registered. Anything that fails is rejected on the spot.</p></div>
+      <div class="box"><h3><span class="ico">🧭</span>Supplier &amp; buyer features</h3><p>Registering companies, recording steps, publishing products, and generating QR codes — all the everyday actions the apps need.</p></div>
+      <div class="box" style="border-color:var(--green)"><h3><span class="ico">⚖️</span>The verifier</h3><p>The core service that takes a product's history and decides whether it's trustworthy and how Canadian it is.</p></div>
+    </div>
+  </div>
+
+  <div class="arr">↓</div>
+
+  <!-- ③ ENGINES -->
+  <div class="band">
+    <div class="bandlab"><span class="num">3</span>Two ways to check a product</div>
+    <div class="engines">
+      <div class="engine a">
+        <div class="etitle">The trust check</div>
+        <div class="esub">Is this history real, and how Canadian is it?</div>
+        <div class="pipe">
+          <div class="step"><div class="n">1</div><h4>Rebuild history</h4><p>piece the steps together</p></div>
+          <div class="step"><div class="n">2</div><h4>Check signatures</h4><p>confirm nothing was altered</p></div>
+          <div class="step"><div class="n">3</div><h4>Add up costs</h4><p>by where work happened</p></div>
+          <div class="step"><div class="n">4</div><h4>Give a label</h4><p>“Made in Canada,” etc.</p></div>
+        </div>
+        <div class="note a">⚑ <b>Catches cheating</b> — forged signatures, broken links, impossible quantities, looping or out-of-order steps, and claims copied from another product.</div>
+        <div class="out"><div class="outbar">→ a clear verdict: trustworthy or not, % Canadian, and the label</div></div>
+      </div>
+      <div class="engine b">
+        <div class="etitle">The buyer's report</div>
+        <div class="esub">A full, readable story of the product</div>
+        <div class="pipe">
+          <div class="step"><div class="n">1</div><h4>Look up history</h4><p>from the database</p></div>
+          <div class="step"><div class="n">2</div><h4>Handle gaps</h4><p>still works if data's partial</p></div>
+          <div class="step"><div class="n">3</div><h4>Break down cost</h4><p>by supplier and step</p></div>
+          <div class="step"><div class="n">4</div><h4>Build report</h4><p>a “product passport”</p></div>
+        </div>
+        <div class="note b">▣ <b>Rich detail</b> — the full supplier chain, a cost breakdown, where the final work was done, and any warnings, all in plain language.</div>
+        <div class="out"><div class="outbar">→ a product passport the buyer's app displays</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arr">↓</div>
+
+  <!-- ④ DATABASE -->
+  <div class="band">
+    <div class="bandlab"><span class="num">4</span>The database — where everything is stored</div>
+    <div class="dbcard">
+      <div class="dbhead"><span class="ico">🗄️</span>One database, four record types<span class="badge">PostgreSQL</span></div>
+      <div class="tables">
+        <div class="tbl">
+          <div class="tn">🏢 Suppliers</div>
+          <div class="role">Who's who</div>
+          <p>Each company and its public signature key — so AEGIS can confirm a step really came from them.</p>
+        </div>
+        <div class="tbl">
+          <div class="tn">📝 Steps</div>
+          <div class="role">The claims</div>
+          <p>Every signed step in a product's history, kept exactly as it was sent so the signature always holds.</p>
+        </div>
+        <div class="tbl">
+          <div class="tn">🔗 Links</div>
+          <div class="role">What built what</div>
+          <p>Records which earlier steps fed into each new one — this is what forms the product's full history.</p>
+        </div>
+        <div class="tbl">
+          <div class="tn">📦 Products</div>
+          <div class="role">On the shelf</div>
+          <p>Finished products a supplier has published, ready for a buyer to scan and look up by QR code.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="deploybar">
+    <span class="pill"><b>Web app</b> for suppliers</span>
+    <span class="pill"><b>AEGIS Scan</b> phone app for buyers</span>
+    <span class="pill"><b>One service</b> + a single PostgreSQL database</span>
+  </div>
+
+  <div class="foot"><span>www.thealphanova.com</span><span class="rule"></span><span>The Alpha Nova · AEGIS</span></div>
+</div>
+</body>
+</html>

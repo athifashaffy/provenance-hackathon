@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEGIS — The Alpha Nova</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#2f4fb0; --blue-deep:#1f3a8a; --ink:#16213e; --red:#d83434;
+    --bg:#f1f3f7; --card:#ffffff; --muted:#5b6b8c; --line:#c7d0e6; --green:#1f6b4f;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{background:#444a5a; font-family:'Inter',sans-serif; color:var(--ink);}
+  .deck{}
+  .slide{
+    position:relative; width:100vw; height:56.25vw; max-height:100vh; max-width:177.78vh;
+    margin:0 auto; background:var(--bg); overflow:hidden;
+    display:flex; flex-direction:column; padding:4.2vh 5vw;
+    page-break-after:always;
+  }
+  /* scale typography to slide width via vw so it always fits 16:9 */
+  .display{font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:.02em;}
+  h1.title{font-family:'Rajdhani',sans-serif; font-weight:700; color:var(--blue); font-size:5.2vw; line-height:1; text-align:center; text-transform:uppercase; letter-spacing:.03em;}
+  h2.sub{font-family:'Rajdhani',sans-serif; font-weight:700; color:var(--blue-deep); font-size:2.1vw; text-align:center; text-transform:uppercase; letter-spacing:.04em; margin-top:1.4vh;}
+  p.lede{font-size:1.35vw; color:var(--muted); text-align:center; max-width:80%; margin:1.6vh auto 0; line-height:1.45;}
+  .tag{font-family:'Rajdhani',sans-serif; font-weight:600; color:var(--blue); letter-spacing:.18em; font-size:1.1vw; text-transform:uppercase;}
+  .footer{position:absolute; left:5vw; right:5vw; bottom:3vh; display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:1vw;}
+  .footer .rule{flex:1; height:1px; background:var(--line); margin:0 1.4vw;}
+  .logo{position:absolute; top:3.4vh; right:5vw; font-family:'Rajdhani',sans-serif; font-weight:700; color:var(--blue); font-size:1.7vw; border:.18vw solid var(--blue); border-radius:50%/60%; padding:.2vh 1.1vw; letter-spacing:.05em;}
+  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:2vw; margin-top:auto; margin-bottom:auto;}
+  .grid2{display:grid; grid-template-columns:repeat(2,1fr); gap:1.6vw 2.6vw; margin-top:3vh;}
+  .card{background:var(--card); border:.13vw solid var(--line); border-radius:1.2vw; padding:2.4vh 1.7vw;}
+  .card h3{font-family:'Rajdhani',sans-serif; font-weight:700; color:var(--blue-deep); font-size:1.7vw; margin-bottom:1vh;}
+  .card p{font-size:1.05vw; color:var(--ink); line-height:1.45;}
+  .num{font-family:'Rajdhani',sans-serif; font-weight:700; color:var(--blue); font-size:4.2vw; line-height:.9;}
+  .row{display:flex; gap:1.4vw; align-items:flex-start; margin-bottom:2.4vh;}
+  .row .txt h3{font-family:'Rajdhani',sans-serif; font-weight:700; color:var(--blue-deep); font-size:1.8vw;}
+  .row .txt p{font-size:1.1vw; color:var(--ink); margin-top:.4vh; line-height:1.4;}
+  .pill{display:inline-block; background:var(--blue); color:#fff; font-family:'Rajdhani',sans-serif; font-weight:600; font-size:1vw; padding:.5vh 1vw; border-radius:2vw; letter-spacing:.03em;}
+  .stat{font-family:'Rajdhani',sans-serif; font-weight:700; color:var(--blue); font-size:5vw; line-height:1;}
+  .stat-l{font-size:1.05vw; color:var(--muted); margin-top:.6vh;}
+  .red{color:var(--red);} .green{color:var(--green);}
+  .center-col{display:flex; flex-direction:column; justify-content:center; height:100%; align-items:center;}
+  .kbd{font-size:.8vw; color:#cfd6e6; text-align:center; padding:1vh;}
+  /* DAG */
+  .node{background:#fff; border:.16vw solid var(--blue); border-radius:1vw; padding:1.2vh 1vw; text-align:center; font-family:'Rajdhani',sans-serif; font-weight:700; color:var(--blue-deep); font-size:1.25vw; min-width:9vw;}
+  .node.x{border-color:var(--green); color:var(--green);}
+  .node.f{background:var(--blue); color:#fff; border-color:var(--blue);}
+  .node.bad{border-color:var(--red); color:var(--red);}
+  .node small{display:block; font-family:'Inter'; font-weight:500; font-size:.8vw; color:var(--muted); margin-top:.3vh;}
+  .node.f small{color:#d7e0ff;}
+  @media print{
+    html,body{background:#fff;}
+    .slide{width:100%; height:100vh; max-height:none; max-width:none; margin:0;}
+    .kbd{display:none;}
+    @page{size:landscape;}
+  }
+  /* nav dots */
+  .nav{position:fixed; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:6px; z-index:50;}
+  .nav b{width:8px;height:8px;border-radius:50%;background:#8893ad;cursor:pointer;}
+  .nav b.on{background:var(--blue);}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- 1 · TITLE -->
+  <section class="slide">
+    <div class="tag" style="position:absolute;top:5vh;left:5vw;">THE ALPHA NOVA · PRESENTS</div>
+    <div class="center-col">
+      <div class="display" style="color:var(--blue);font-size:9vw;line-height:.9;">AEGIS</div>
+      <h2 class="sub" style="font-size:2.6vw;margin-top:2vh;">Cryptographic provenance for Buy&nbsp;Canadian procurement</h2>
+      <p class="lede" style="font-size:1.5vw;margin-top:2.4vh;">Origin you can <b style="color:var(--blue-deep)">prove</b> — not just claim.</p>
+    </div>
+    <div style="position:absolute;bottom:4vh;left:0;right:0;text-align:center;" class="display"><span class="red">RED TEAM DEFTECH HACKATHON</span> · OTTAWA · MAY 30 2026</div>
+  </section>
+
+  <!-- 2 · PROBLEM -->
+  <section class="slide">
+    <div class="logo">TAN</div>
+    <h1 class="title">The Problem</h1>
+    <h2 class="sub">“Buy Canadian” matters — but nobody can verify it</h2>
+    <div style="display:grid;grid-template-columns:1.2fr .9fr;gap:3vw;margin-top:auto;margin-bottom:auto;align-items:center;">
+      <div>
+        <div class="row"><div class="num">1.</div><div class="txt"><h3>Security you can't see</h3><p>Critical electronics — chips, flight controllers, radios — sourced abroad can hide undisclosed parts or firmware-level backdoors. For defence and dual-use systems, an origin you can't verify is a risk you can't manage.</p></div></div>
+        <div class="row"><div class="num">2.</div><div class="txt"><h3>Sovereignty &amp; jobs</h3><p>Low-cost offshore labour and opaque tiers undercut Canadian industry. Procurement dollars meant to build domestic capability leak abroad when no one can check where value was actually added.</p></div></div>
+        <div class="row"><div class="num">3.</div><div class="txt"><h3>A claim, not a proof</h3><p>Today “Made in Canada” rests on supplier self-reporting — easy to misrepresent, impossible to audit once a product has passed through many hands.</p></div></div>
+      </div>
+      <div class="card">
+        <h3 style="text-align:center;">The Legal Bar</h3>
+        <div class="card" style="margin-top:1.6vh;border-color:var(--blue);"><p style="font-weight:600;color:var(--blue-deep)">Product of Canada</p><div class="stat" style="font-size:3.4vw">98%</div><p style="color:var(--muted)">≥98% of direct costs in Canada + last substantial transformation here.</p></div>
+        <div class="card" style="margin-top:1.4vh;border-color:var(--blue);"><p style="font-weight:600;color:var(--blue-deep)">Made in Canada</p><div class="stat" style="font-size:3.4vw">51%</div><p style="color:var(--muted)">≥51% of direct costs in Canada + last substantial transformation here.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>www.thealphanova.com</span><span class="rule"></span><span>2</span></div>
+  </section>
+
+  <!-- 3 · SOLUTION -->
+  <section class="slide">
+    <div class="logo">TAN</div>
+    <h1 class="title">The Solution</h1>
+    <h2 class="sub">AEGIS — “trust, but verify” for origin</h2>
+    <p class="lede">Don't take the supplier's word for it. Submit a product's full attestation chain; AEGIS returns its Canadian-content %, its legal designation, whether the chain is valid, and every anomaly it found — built on the organizer's <b>byte-exact reference crypto</b>.</p>
+    <div class="grid3">
+      <div class="card"><h3>① Verify every signature</h3><p>Each contribution is an <b>Ed25519-signed attestation</b> checked against a registered supplier key, and <b>hash-linked</b> to the exact content of the inputs it consumed — a tamper-evident chain of custody.</p></div>
+      <div class="card"><h3>② Compute the designation</h3><p>Walk the supply graph, sum direct costs by <b>country of work</b>, and decide <b>Product of Canada</b> / <b>Made in Canada</b> / none against the legal thresholds — deterministically.</p></div>
+      <div class="card"><h3>③ Detect what self-reporting hides</h3><p>Catch integrity, replay, quantity, structural and statistical attacks — and stay standing on incomplete data. <b>Stateless, one-command Docker deploy.</b></p></div>
+    </div>
+    <div style="text-align:center;margin-top:2.4vh;"><span class="pill" style="font-size:1.05vw;">POST /verify → { canadian_content_percentage, designation, chain_valid, anomalies[] }</span></div>
+    <div class="footer"><span>www.thealphanova.com</span><span class="rule"></span><span>3</span></div>
+  </section>
+
+  <!-- 4 · HOW IT WORKS (DAG) -->
+  <section class="slide">
+    <div class="logo">TAN</div>
+    <h1 class="title">How It Works</h1>
+    <h2 class="sub">From raw material to finished drone</h2>
+    <p class="lede">Each contribution is a signed attestation referencing the inputs it consumed — forming a directed graph from raw materials up to the finished product. Trace any product back to its origins.</p>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:auto 0;gap:1vw;">
+      <div style="display:flex;flex-direction:column;gap:1.6vh;">
+        <div class="node">Aluminium<small>raw · CA</small></div>
+        <div class="node bad">Battery cells<small>raw · CN</small></div>
+        <div class="node">Carbon fibre<small>raw · CA</small></div>
+      </div>
+      <div style="font-size:2vw;color:var(--blue);">→</div>
+      <div style="display:flex;flex-direction:column;gap:3vh;">
+        <div class="node x">Motor housing<small>component · CA</small></div>
+        <div class="node x">Battery pack<small>component · CA</small></div>
+      </div>
+      <div style="font-size:2vw;color:var(--green);">→</div>
+      <div class="node x">Propulsion<small>subassembly · CA</small></div>
+      <div style="font-size:2vw;color:var(--green);">→</div>
+      <div class="node f">DRONE<small>final integration · CA</small></div>
+    </div>
+    <div class="footer"><span>www.thealphanova.com</span><span class="rule"></span><span>4</span></div>
+  </section>
+
+  <!-- 5 · ARCHITECTURE -->
+  <section class="slide" style="padding:0;">
+    <img src="AEGIS_architecture.png" alt="AEGIS architecture" style="width:100%;height:100%;object-fit:contain;background:var(--bg);">
+  </section>
+
+  <!-- 6 · WHAT AEGIS ANSWERS -->
+  <section class="slide">
+    <div class="logo">TAN</div>
+    <h1 class="title">What AEGIS Answers</h1>
+    <p class="lede">A buyer scans a product and gets a procurement-ready answer — no expertise required.</p>
+    <div class="grid3">
+      <div class="card"><h3>Does it qualify?</h3><p><b>Made in Canada</b> or <b>Product of Canada</b>, computed directly from the chain against the legal thresholds.</p></div>
+      <div class="card"><h3>How Canadian is it?</h3><p>The <b>exact percentage</b> of the product's direct cost performed in Canada — attributed per attestation.</p></div>
+      <div class="card"><h3>Can I trust it?</h3><p>Every signature verified end-to-end; <b>any tampering is flagged</b> and classified.</p></div>
+    </div>
+    <div style="text-align:center;margin-top:3vh;"><span class="pill" style="font-size:1.3vw;font-style:italic;">Example: “Made in Canada · 58.4% Canadian · chain verified · 0 anomalies”</span></div>
+    <div class="footer"><span>www.thealphanova.com</span><span class="rule"></span><span>6</span></div>
+  </section>
+
+  <!-- 6 · THREAT MODEL / WHAT WE CATCH (the 5 categories) -->
+  <section class="slide">
+    <div class="logo">TAN</div>
+    <h1 class="title"><span class="red">Tamper-Evident</span></h1>
+    <h2 class="sub">What self-reporting can't catch</h2>
+    <p class="lede">Every supplier private key ships in the kit — so an attacker can sign a <i>false</i> chain. A valid signature isn't enough; AEGIS reasons about whether a chain is <b>internally consistent and physically plausible</b>, and classifies each violation.</p>
+    <div class="grid2">
+      <div class="row"><div class="num" style="font-size:2.6vw;">⮾</div><div class="txt"><h3>Integrity / forgery</h3><p>Modified after signing, or signed by a key not in the verified registry.</p></div></div>
+      <div class="row"><div class="num" style="font-size:2.6vw;">↻</div><div class="txt"><h3>Replay & reuse</h3><p>One product's attestation dropped into another's chain, or reused across products.</p></div></div>
+      <div class="row"><div class="num" style="font-size:2.6vw;">≷</div><div class="txt"><h3>Quantity violations</h3><p>A chain consumes more material than upstream suppliers ever produced — summed globally across diamonds.</p></div></div>
+      <div class="row"><div class="num" style="font-size:2.6vw;">⌥</div><div class="txt"><h3>Structural problems</h3><p>Missing references, broken hash links, cycles, impossible orderings.</p></div></div>
+      <div class="row"><div class="num" style="font-size:2.6vw;">⚑</div><div class="txt"><h3>Statistical outliers</h3><p>Legal on every rule, yet anomalous vs. how genuine chains look — learned from 1,000 chains.</p></div></div>
+      <div class="row"><div class="num" style="font-size:2.6vw;">◌</div><div class="txt"><h3>Incomplete data</h3><p>Missing fields flag uncertainty — the verifier still returns a useful answer without falling over.</p></div></div>
+    </div>
+    <div class="footer"><span>www.thealphanova.com</span><span class="rule"></span><span>7</span></div>
+  </section>
+
+  <!-- 7 · RESULTS / TECHNICAL PROOF -->
+  <section class="slide">
+    <div class="logo">TAN</div>
+    <h1 class="title">Proven, Not Promised</h1>
+    <h2 class="sub">Graded against the official harness</h2>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2vw;margin:auto 0;text-align:center;">
+      <div><div class="stat">98.2%</div><div class="stat-l">official self-test<br>(1,000 labeled chains)</div></div>
+      <div><div class="stat green">100%</div><div class="stat-l">clean chains —<br>zero false positives</div></div>
+      <div><div class="stat">5/5</div><div class="stat-l">attack categories<br>detected & classified</div></div>
+      <div><div class="stat">0</div><div class="stat-l">crashes on malformed<br>or incomplete input</div></div>
+    </div>
+    <p class="lede" style="margin-top:1vh;">Byte-exact on the organizer's reference crypto. Validated beyond the corpus: <b>1,500+ freshly-synthesized signed chains</b> with an independent labeler, plus targeted tests for the gaps the training set never covers — diamond DAGs, anchor-registry replay, designation boundaries.</p>
+    <div class="footer"><span>www.thealphanova.com</span><span class="rule"></span><span>8</span></div>
+  </section>
+
+  <!-- 8 · WHY DIFFERENT -->
+  <section class="slide">
+    <div class="logo">TAN</div>
+    <h1 class="title">Why It's Different</h1>
+    <h2 class="sub">Proof without exposure</h2>
+    <p class="lede">Provenance you can trust, without leaking the supply chain a competitor could copy. Built on patterns proven in <b>Catena-X</b>, the German automotive data space.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.8vw;margin-top:auto;margin-bottom:auto;">
+      <div class="card"><h3>Supply chain stays hidden</h3><p>Verify origin without revealing who the suppliers are or what they charge.</p></div>
+      <div class="card"><h3>Federated, not centralized</h3><p>No single honeypot — providers keep their own data and share only what's needed.</p></div>
+      <div class="card"><h3>Identity + trust anchor</h3><p>Keyed identities vouched by a trusted authority; a signed anchor registry an attacker can't rewrite.</p></div>
+      <div class="card"><h3>QR → digital product passport</h3><p>A buyer-facing scan any non-technical user can read in seconds.</p></div>
+    </div>
+    <div class="footer"><span>www.thealphanova.com</span><span class="rule"></span><span>9</span></div>
+  </section>
+
+  <!-- 9 · WHY IT MATTERS / FEASIBILITY -->
+  <section class="slide">
+    <div class="logo">TAN</div>
+    <h1 class="title">Why It Matters</h1>
+    <h2 class="sub">Sovereign supply chains</h2>
+    <p class="lede">Drones are the use case — the <i>model</i> is the point. AEGIS makes <b style="color:var(--blue-deep)">“Buy Canadian”</b> enforceable for any multi-tier product.</p>
+    <div style="margin:auto 0;">
+      <div class="row"><div class="num" style="font-size:2.4vw;">🛡</div><div class="txt"><h3>Protects defence procurement</h3><p>Gives the Canadian Armed Forces a way to trust origin claims on dual-use goods.</p></div></div>
+      <hr style="border:none;border-top:.12vw solid var(--line);margin:1.2vh 0;">
+      <div class="row"><div class="num" style="font-size:2.4vw;">📈</div><div class="txt"><h3>Scales beyond drones</h3><p>The same attestation graph + stateless verifier works for any layered supply chain — deployed today as a one-command Docker Compose service.</p></div></div>
+      <hr style="border:none;border-top:.12vw solid var(--line);margin:1.2vh 0;">
+      <div class="row"><div class="num" style="font-size:2.4vw;">✓</div><div class="txt"><h3>Claim → proof</h3><p>Turns “Made in Canada” from a label into something a buyer can independently verify in seconds.</p></div></div>
+    </div>
+    <div class="footer"><span>www.thealphanova.com</span><span class="rule"></span><span>10</span></div>
+  </section>
+
+  <!-- 10 · TEAM -->
+  <section class="slide">
+    <div class="logo">TAN</div>
+    <h1 class="title">Our Team</h1>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2vw;margin-top:5vh;text-align:center;">
+      <div><div class="pill" style="display:block;margin-bottom:1vh;">Cheick Ismael Maiga</div><p style="color:var(--muted);font-family:'Rajdhani';font-weight:600;letter-spacing:.06em;">TEAM LEAD</p></div>
+      <div><div class="pill" style="display:block;margin-bottom:1vh;">Athif Shaffy</div><p style="color:var(--muted);font-family:'Rajdhani';font-weight:600;letter-spacing:.06em;">STRATEGY & ARCHITECTURE</p></div>
+      <div><div class="pill" style="display:block;margin-bottom:1vh;">Boubacar Ba</div><p style="color:var(--muted);font-family:'Rajdhani';font-weight:600;letter-spacing:.06em;">LEAD DEVELOPER</p></div>
+      <div><div class="pill" style="display:block;margin-bottom:1vh;">Thariq</div><p style="color:var(--muted);font-family:'Rajdhani';font-weight:600;letter-spacing:.06em;">ENGINEER</p></div>
+    </div>
+    <div style="margin-top:6vh;text-align:center;">
+      <div class="card" style="display:inline-block;max-width:60%;border-color:var(--blue);">
+        <h3 style="font-size:1.9vw;">Prof. Sk. Md. Mizanur Rahman, PhD., ECSA</h3>
+        <p style="font-family:'Rajdhani';font-weight:600;letter-spacing:.06em;color:var(--blue);margin-top:.5vh;">ADVISOR</p>
+        <p style="color:var(--muted);margin-top:1vh;">Cryptography, security architecture & data-space guidance — his mentorship shaped the trust model behind AEGIS.</p>
+      </div>
+    </div>
+    <div class="footer"><span>www.thealphanova.com</span><span class="rule"></span><span>11</span></div>
+  </section>
+
+  <!-- 11 · CLOSE -->
+  <section class="slide">
+    <div class="center-col">
+      <div class="logo" style="position:static;font-size:2.4vw;margin-bottom:2vh;">TAN</div>
+      <div class="display" style="color:var(--blue);font-size:8vw;line-height:.9;">AEGIS</div>
+      <h2 class="sub" style="font-size:2.4vw;margin-top:2.4vh;">Origin you can prove, not just claim.</h2>
+      <p class="lede" style="font-size:1.3vw;">Signed at the source · linked into a tamper-evident chain · independently verifiable.</p>
+    </div>
+    <div style="position:absolute;bottom:4vh;left:0;right:0;text-align:center;" class="display"><span class="red">RED TEAM DEFTECH HACKATHON</span> · OTTAWA · MAY 30 2026 &nbsp;·&nbsp; www.thealphanova.com</div>
+  </section>
+
+</div>
+
+<div class="nav" id="nav"></div>
+<div class="kbd">← / → or Space to navigate · press <b>F</b> for fullscreen · Cmd/Ctrl-P → Save as PDF (Landscape, margins None, Background graphics ✓)</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const nav=document.getElementById('nav');
+  let i=0;
+  slides.forEach((s,n)=>{const b=document.createElement('b');b.onclick=()=>go(n);nav.appendChild(b);});
+  function show(){slides.forEach((s,n)=>s.style.display=(n===i?'flex':'none'));[...nav.children].forEach((b,n)=>b.className=(n===i?'on':''));}
+  function go(n){i=Math.max(0,Math.min(slides.length-1,n));show();}
+  // default: scroll mode off — show one at a time
+  const PRINT = window.matchMedia('print');
+  function applyMode(){ if(PRINT.matches){slides.forEach(s=>s.style.display='flex');} else {show();} }
+  window.addEventListener('keydown',e=>{
+    if(['ArrowRight',' ','PageDown'].includes(e.key)){go(i+1);e.preventDefault();}
+    if(['ArrowLeft','PageUp'].includes(e.key)){go(i-1);e.preventDefault();}
+    if(e.key==='f'||e.key==='F'){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}
+  });
+  show();
+</script>
+</body>
+</html>

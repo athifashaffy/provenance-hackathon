@@ -1,0 +1,349 @@
+{
+  "product_attestation_id": "att-anchor-0012",
+  "attestations": [
+    {
+      "attestation_id": "att-anchor-0001",
+      "version": "1.0",
+      "supplier_id": "sup-porcher",
+      "timestamp": "2026-03-06T09:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "FR",
+      "parents": [],
+      "output": {
+        "name": "PN9 Ripstop Fabric",
+        "quantity_produced": 8.0,
+        "unit": "m2"
+      },
+      "costs": {
+        "material_cad": 360.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "DdFl42bZO0UxXeQiH4RZtyaIjmuboJd11r7cgX2nn+O8esEizeE2TGtm0y9KKTGHZ6oNGs5Jx+zfpqbowZCRDQ=="
+      }
+    },
+    {
+      "attestation_id": "att-anchor-0002",
+      "version": "1.0",
+      "supplier_id": "sup-cousin",
+      "timestamp": "2026-03-06T09:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "FR",
+      "parents": [],
+      "output": {
+        "name": "Suspension Line (braided)",
+        "quantity_produced": 12.0,
+        "unit": "m"
+      },
+      "costs": {
+        "material_cad": 36.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "iFYVhbjHTfOBnfFXZi/b/XicObfMxsAAY6Y2h4Kk5z226kS66MKT2YraguoVU/skwgyQbh07r9m9XhRqz4HUBw=="
+      }
+    },
+    {
+      "attestation_id": "att-anchor-0003",
+      "version": "1.0",
+      "supplier_id": "sup-mcmaster",
+      "timestamp": "2026-03-06T09:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "US",
+      "parents": [],
+      "output": {
+        "name": "Heat-Set Threaded Insert",
+        "quantity_produced": 4,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 2.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "mLTbjHEzIzw5NP1S9AQXtAHh4B9vUYWZPDTeFTeNcg1pmCGFrT4OTLj1AaUvgXFESIUJx+5+fiiNjb3bqVakCQ=="
+      }
+    },
+    {
+      "attestation_id": "att-anchor-0004",
+      "version": "1.0",
+      "supplier_id": "sup-mcmaster",
+      "timestamp": "2026-03-06T09:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "US",
+      "parents": [],
+      "output": {
+        "name": "Phillips Thread-Forming Screw",
+        "quantity_produced": 8,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 1.2,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "jfZpKVyeth/bPYQx1Zz/Fqxf4nIjNruKnlSf7mltvFd9bb7OinCyRTOdKCysMsMCnFxrUrbqJeF6Wm3jLFucDQ=="
+      }
+    },
+    {
+      "attestation_id": "att-anchor-0005",
+      "version": "1.0",
+      "supplier_id": "sup-avss-corp",
+      "timestamp": "2026-03-21T14:30:00Z",
+      "action_type": "component_manufacture",
+      "performed_in_country": "CA",
+      "parents": [
+        {
+          "attestation_id": "att-anchor-0001",
+          "content_hash": "1ed6d6cc7b1526c7473ad8532a6f8ae5e17470bc09434f5da51e9d33c2cddaa4",
+          "quantity_consumed": 8.0,
+          "unit": "m2"
+        },
+        {
+          "attestation_id": "att-anchor-0002",
+          "content_hash": "5b80da598314031d60883ed06302e2ca2adbba33897612477c6a3847d1d41b42",
+          "quantity_consumed": 12.0,
+          "unit": "m"
+        },
+        {
+          "attestation_id": "att-anchor-0003",
+          "content_hash": "d9c93065b394d958c4e0a0ed015a6efa23f5b7f061852c8a5825a2936861d8b7",
+          "quantity_consumed": 4,
+          "unit": "units"
+        },
+        {
+          "attestation_id": "att-anchor-0004",
+          "content_hash": "03ab4bbcc8b38a7f39054e227f9818f02c7ce3bb50ca4e8ac5e80c9272f9c6ab",
+          "quantity_consumed": 8,
+          "unit": "units"
+        }
+      ],
+      "output": {
+        "name": "Parachute Recovery Assembly",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 0.0,
+        "labour_hours": 6.5,
+        "labour_cost_cad": 520.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "B+m+AQz1dtpWVuz0+WmTNYXUN4fMl4bDwITipycWNWVDOO0Hz1KRZuw0wZCwcYRx+TKNaMgAEwLyCTVANUwQCA=="
+      }
+    },
+    {
+      "attestation_id": "att-anchor-0006",
+      "version": "1.0",
+      "supplier_id": "sup-protolabs",
+      "timestamp": "2026-03-26T09:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "US",
+      "parents": [],
+      "output": {
+        "name": "M3E Machined Enclosure",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 140.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "psel2Q++thTxLzczYStXT0RYwebCYFfKNWtvAuzamDno+Gv0fZ7AtRIm2gPoBR3URAHY9BPSqm69pZZNwVv8Bg=="
+      }
+    },
+    {
+      "attestation_id": "att-anchor-0007",
+      "version": "1.0",
+      "supplier_id": "sup-tbs",
+      "timestamp": "2026-03-26T09:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "HK",
+      "parents": [],
+      "output": {
+        "name": "TBS H7 Flight Controller",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 120.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "61MqCGJs6F/zWD5WCXAMrpOTyORJzr6b0r40mJAInpFvKBFRSqnv6kdHnIdN+vB+OADQCNRu7yXqAm/VLpPDBA=="
+      }
+    },
+    {
+      "attestation_id": "att-anchor-0008",
+      "version": "1.0",
+      "supplier_id": "sup-sequre",
+      "timestamp": "2026-03-26T09:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "CN",
+      "parents": [],
+      "output": {
+        "name": "GNSS / GPS Module",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 35.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "i2QkmySyWv2z4aeNfU7MLyOPNLYWlppPtYoPn++KaKGL7JvKsMVpQDUntPLvxfQ4z5Ng86zhyKKYXXqDWBcsBA=="
+      }
+    },
+    {
+      "attestation_id": "att-anchor-0009",
+      "version": "1.0",
+      "supplier_id": "sup-mcmaster",
+      "timestamp": "2026-03-26T09:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "VN",
+      "parents": [],
+      "output": {
+        "name": "O-Ring Seal",
+        "quantity_produced": 4,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 2.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "xeyiY8L4jco9fVyADNQIJJ+sJ/LD7f40MxM/PKA3fdcbKc4OgjQejoUHsGMYSfcEFAp31j4Y3FcVbaVLscmhCA=="
+      }
+    },
+    {
+      "attestation_id": "att-anchor-0010",
+      "version": "1.0",
+      "supplier_id": "sup-mcmaster",
+      "timestamp": "2026-03-26T09:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "US",
+      "parents": [],
+      "output": {
+        "name": "Phillips Thread-Forming Screw",
+        "quantity_produced": 12,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 1.8,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "OuH5YiC+tDV7Pe5ZZcPtmfYOdZ27hFMsilBHSUnUlwRl90ZHiA2MsbRP/Tk9IDF9R/qhWuX/cZBFFKjlGTq6Cw=="
+      }
+    },
+    {
+      "attestation_id": "att-anchor-0011",
+      "version": "1.0",
+      "supplier_id": "sup-nanuk",
+      "timestamp": "2026-03-26T09:00:00Z",
+      "action_type": "raw_material_supply",
+      "performed_in_country": "CA",
+      "parents": [],
+      "output": {
+        "name": "Nanuk 905 Protective Case",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 60.0,
+        "labour_hours": 0.0,
+        "labour_cost_cad": 0.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "4V1HjnQSdDnRWneUvRqEx1D/XFOe3dXlnCqWXB7e8G6phyFXSn8/kK37zN3WZDxx8Wdby3nwNzzDewdilhkJBw=="
+      }
+    },
+    {
+      "attestation_id": "att-anchor-0012",
+      "version": "1.0",
+      "supplier_id": "sup-avss-corp",
+      "timestamp": "2026-04-10T14:30:00Z",
+      "action_type": "final_integration",
+      "performed_in_country": "CA",
+      "parents": [
+        {
+          "attestation_id": "att-anchor-0005",
+          "content_hash": "d27cc6a9997e233e82f0b9cf0bd6c960b4dd68428f86485382914c91dbfe1faf",
+          "quantity_consumed": 1,
+          "unit": "units"
+        },
+        {
+          "attestation_id": "att-anchor-0006",
+          "content_hash": "33fdd6a4d2c49871e0f06c29533b371b4a5bf515c4ed07fcd4409f5648ef11ac",
+          "quantity_consumed": 1,
+          "unit": "units"
+        },
+        {
+          "attestation_id": "att-anchor-0007",
+          "content_hash": "3ad00996fc579c8355f430c8865cba2dd9286aba9e6fbd9ebf2cc765f7b1e015",
+          "quantity_consumed": 1,
+          "unit": "units"
+        },
+        {
+          "attestation_id": "att-anchor-0008",
+          "content_hash": "f48df02ad6882200bde2395cb0aec0604ce3a39c6e83111946c77fcdcc9058f6",
+          "quantity_consumed": 1,
+          "unit": "units"
+        },
+        {
+          "attestation_id": "att-anchor-0009",
+          "content_hash": "5cee46f1433bf3a6c706c8596714bb0a974d3cfa39a4b83327b6c7011822b75b",
+          "quantity_consumed": 4,
+          "unit": "units"
+        },
+        {
+          "attestation_id": "att-anchor-0010",
+          "content_hash": "f345fd58a7c24d40b2a16ac0664be9af0fbe2f0ac060e748e56ab15f5e4e004b",
+          "quantity_consumed": 12,
+          "unit": "units"
+        },
+        {
+          "attestation_id": "att-anchor-0011",
+          "content_hash": "e40eae866395c19824c796c09a95173b4f1ff61c4299bdffbb0474ad7f9e2d50",
+          "quantity_consumed": 1,
+          "unit": "units"
+        }
+      ],
+      "output": {
+        "name": "Recovery-Capable ISR Drone",
+        "quantity_produced": 1,
+        "unit": "units"
+      },
+      "costs": {
+        "material_cad": 0.0,
+        "labour_hours": 5.0,
+        "labour_cost_cad": 400.0
+      },
+      "signature": {
+        "algorithm": "ed25519",
+        "value": "9mshMTY2ShJSjSRCvUNqs4M+rLcITyV5Z8MfSiDJq4lZ9SSeaG2mBcb7uxiRL83L25EVu1u3Bwm1VM0BVJaHAA=="
+      }
+    }
+  ]
+}

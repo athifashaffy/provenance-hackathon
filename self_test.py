@@ -35,7 +35,8 @@ def score_case(kind, expected, t4_perturbed, response):
         tp = len(truth & flagged)
         prec = tp / len(flagged) if flagged else 0.0
         rec = tp / len(truth) if truth else 1.0
-        return 2 * prec * rec / (prec + rec) if (prec + rec) else 0.0
+        f1 = 2 * prec * rec / (prec + rec) if (prec + rec) else 0.0
+        return f1, f1
     try:
         diff = abs(float(response.get("canadian_content_percentage", -999)) - expected["canadian_content_percentage"])
     except (TypeError, ValueError):
@@ -53,7 +54,8 @@ def score_case(kind, expected, t4_perturbed, response):
         prec, rec = len(tp) / len(resp_ids), len(tp) / len(exp_ids)
         f1 = 2 * prec * rec / (prec + rec) if (prec + rec) else 0.0
     classif = (sum(1 for i in tp if exp_map[i] & resp_map[i]) / len(tp)) if tp else (1.0 if not exp_ids else 0.0)
-    return 0.30 * pct + 0.35 * f1 + 0.20 * desig + 0.15 * classif
+    score = 0.30 * pct + 0.35 * f1 + 0.20 * desig + 0.15 * classif
+    return score, f1
 
 
 def call(url, sub, timeout=10):
@@ -75,25 +77,28 @@ def main():
         rows = rows[:args.limit]
 
     from collections import defaultdict
-    agg = defaultdict(lambda: [0.0, 0])
+    agg = defaultdict(lambda: [0.0, 0, 0.0])
     total = 0.0
+    total_f1 = 0.0
     for row in rows:
         lab = row["labels"]
         kind = lab.get("attack", "clean")
         try:
             resp = call(args.url, row["chain"])
-            s = score_case(kind, lab, lab.get("t4_perturbed", []), resp)
+            s, f1 = score_case(kind, lab, lab.get("t4_perturbed", []), resp)
         except Exception as e:
-            s = 0.0
+            s, f1 = 0.0, 0.0
         total += s
+        total_f1 += f1
         agg[kind][0] += s
         agg[kind][1] += 1
+        agg[kind][2] += f1
 
-    print(f"\noverall: {total / len(rows) * 100:.1f}%  ({len(rows)} cases)\n")
-    print(f"{'category':28s}  avg     n")
+    print(f"\noverall: {total / len(rows) * 100:.1f}%  ({len(rows)} cases)  (avg F1: {total_f1 / len(rows) * 100:.1f}%)\n")
+    print(f"{'category':28s}  avg     n   f1")
     for k in sorted(agg):
         v = agg[k]
-        print(f"{k:28s}  {v[0]/v[1]*100:5.1f}  {v[1]:4d}")
+        print(f"{k:28s}  {v[0]/v[1]*100:5.1f}  {v[1]:4d}  {v[2]/v[1]*100:5.1f}")
 
 
 if __name__ == "__main__":

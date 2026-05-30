@@ -1,0 +1,42 @@
+# Ralph Progress Log
+Started: 2026-05-30
+---
+
+## 2026-05-30 — Baseline + analysis (seed iteration, done by hand before autoloop)
+
+BASELINE self_test = 98.5% (1000 cases). All hard-rule categories already 100%.
+Remaining gap is 100% inside the T4 statistical-outlier detectors:
+  t4_cost_outlier   52.9% (17)
+  t4_labour_outlier 78.6% (28)
+  t4_origin_outlier 97.4% (38)   <- only 1 case missed
+  t4_timing_outlier 100%  (41)
+
+KEY FACTS
+- Each T4 case has exactly ONE perturbed attestation; scoring is F1 over its id => all-or-nothing.
+- Current detector has ~0 false positives. Every lost point is a MISS, not an over-flag.
+- Perturbed cost/labour values sit INSIDE the global clean band (e.g. perturbed subassembly rates
+  97-109 while clean subassembly rate maxes at 124). A flat per-action threshold cannot separate.
+
+WHAT GENERALIZES vs WHAT OVERFITS (measured by 5-seed 70/30 CV)
+- Per-(root_product, component, action) "value > clean max" rule => self_test 99.3% BUT held-out
+  clean-FP = 14-20% of clean chains. That is the overfitting trap: the max is computed from the
+  same data, so corpus FP is 0 by construction, but real held-out FP is catastrophic (each clean
+  FP costs 0.35 => est. -3 to -4 points on the official set). REJECTED.
+- Per-(name, action) robust-z holds 0% held-out clean-FP only at z >= ~4.0, where it recovers
+  little extra recall. The original coarse precision-first detector is already near this frontier.
+
+THE 7 UNCATCHABLE NODES (statistically identical to clean data)
+- 3 cost: rate BELOW the clean max for its fine key (e.g. SDR module 106.2 vs clean max 107.5).
+- 3 labour: hours BELOW the clean max for its fine key (e.g. EO/IR gimbal 22.7 vs clean max 23.6).
+- 1 origin: sup-0009 / "Structural adhesive (DP110)" claims CA, but EVERY clean instance of that
+  (supplier, material) is also CA => no honest origin signal.
+=> Catching these requires memorizing their attestation_ids. That is pure overfit and CANNOT help
+   the held-out official score. Do not do it.
+
+CONCLUSION: ~98.5% is the honest generalizable ceiling. Maximize T4 recall ONLY within the CV
+guard (held-out clean-FP < 1%). A "100% self_test" built by overfitting would LOWER the real score.
+
+USEFUL PATTERN (in-process scoring, avoids needing DATABASE_URL to run /verify):
+  monkeypatch verify.detect_outliers, call verify.verify_chain(row["chain"]), score with
+  self_test.score_case(kind, labels, labels["t4_perturbed"], resp). See git history of this branch.
+---

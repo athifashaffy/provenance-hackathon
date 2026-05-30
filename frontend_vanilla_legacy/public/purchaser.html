@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEGIS — Verify Product</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <script src="demo-data.js"></script>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">
+    <div class="logo-mark"><img src="drone-logo.png" alt="AEGIS"></div>
+    <div><div class="logo-text">AEGIS</div><div class="logo-sub">Product Verification</div></div>
+  </a>
+  <nav>
+    <a href="index.html">Dashboard</a>
+    <a href="supplier.html">Supplier</a>
+    <a href="purchaser.html" class="active">Purchaser</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="page-title">Verify Product Provenance</div>
+  <div class="page-sub">Submit a product's attestation chain to the AEGIS engine. Get its designation, Canadian-content %, and any tampering — independently, in one call.</div>
+
+  <!-- sample picker -->
+  <div class="card">
+    <div class="card-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--tan-navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+      Pick a product to verify
+    </div>
+    <div id="sample-buttons" style="display:flex;flex-wrap:wrap;gap:.6rem;"></div>
+    <div style="margin-top:1rem;">
+      <details>
+        <summary style="cursor:pointer;color:var(--tan-gray);font-size:.85rem;">…or paste a chain JSON</summary>
+        <textarea id="paste-json" placeholder='{"product_attestation_id":"…","attestations":[…]}' style="width:100%;height:120px;margin-top:.5rem;font-family:monospace;font-size:.75rem;"></textarea>
+        <button class="btn btn-primary" style="margin-top:.5rem;" onclick="verifyPasted()">Verify pasted chain</button>
+      </details>
+    </div>
+  </div>
+
+  <div id="report"></div>
+</div>
+
+<script>
+const API = window.API_BASE_URL || 'http://localhost:8000';
+const DEMO = window.AEGIS_DEMO || { samples:[] };
+function esc(s){const d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;}
+
+function renderSamples(){
+  document.getElementById('sample-buttons').innerHTML = DEMO.samples.map((s,i)=>{
+    const tone = s.id==='clean'?'btn-success':'btn-outline';
+    return `<button class="btn ${tone}" data-testid="sample-${esc(s.id)}" onclick="verifySample(${i})">${esc(s.label)}</button>`;
+  }).join('');
+}
+
+async function verifySample(i){ await verify(DEMO.samples[i].chain); }
+async function verifyPasted(){
+  try{ await verify(JSON.parse(document.getElementById('paste-json').value)); }
+  catch(e){ document.getElementById('report').innerHTML = '<div class="card">'+alertBox('Invalid JSON: '+e.message,'danger')+'</div>'; }
+}
+
+async function verify(chain){
+  const rep = document.getElementById('report');
+  rep.innerHTML = '<div class="card"><span class="spinner"></span> Verifying through AEGIS /verify…</div>';
+  try{
+    const r = await fetch(API+'/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(chain)});
+    const d = await r.json();
+    rep.innerHTML = renderReport(d, chain);
+  }catch(e){ rep.innerHTML = '<div class="card">'+alertBox('Verification failed: '+e.message,'danger')+'</div>'; }
+}
+
+function renderReport(d, chain){
+  const dz = (d.designation||'none');
+  const dzClass = dz==='product_of_canada'?'designation-product-of-canada':dz==='made_in_canada'?'designation-made-in-canada':'designation-not-qualified';
+  const dzTitle = dz==='product_of_canada'?'Product of Canada':dz==='made_in_canada'?'Made in Canada':'Not Qualified';
+  const pct = Number(d.canadian_content_percentage||0);
+  const valid = d.chain_valid;
+  const anoms = d.anomalies||[];
+  const atts = (chain.attestations||[]);
+
+  let html = `
+  <div class="card designation-hero ${dzClass}" data-testid="report">
+    <div class="designation-label">AEGIS verdict</div>
+    <div class="designation-title" data-testid="designation">${dzTitle}</div>
+    <div class="designation-pct" data-testid="pct">${pct.toFixed(1)}% Canadian content</div>
+    <div style="margin-top:.6rem;">
+      <span class="badge badge-${valid?'success':'danger'}" data-testid="chain-valid">${valid?'CHAIN VERIFIED ✓':'CHAIN INVALID ✗'}</span>
+      <span class="badge badge-info">${atts.length} attestations</span>
+      <span class="badge badge-${anoms.length?'warning':'success'}">${anoms.length} anomaly(ies)</span>
+    </div>
+  </div>`;
+
+  if(anoms.length){
+    html += `<div class="card"><div class="card-title">Detected anomalies</div>`+
+      anoms.map(a=>`<div class="anomaly-item" data-testid="anomaly">
+        <span class="anomaly-type">${esc(a.type)}</span>
+        <span class="mono" style="font-size:.72rem;color:var(--tan-gray);">${esc((a.attestation_id||'').slice(0,18))}…</span>
+        <div style="font-size:.82rem;color:var(--tan-gray);margin-top:.2rem;">${esc(a.details||'')}</div>
+      </div>`).join('')+`</div>`;
+  } else {
+    html += `<div class="card">${alertBox('No integrity anomalies — every signature verified, every link intact.','success',true)}</div>`;
+  }
+
+  html += `<div class="card"><div class="card-title">Supply chain (${atts.length} tiers)</div><table><thead><tr><th>Output</th><th>Action</th><th>Country</th><th>Material $</th><th>Labour $</th></tr></thead><tbody>`+
+    atts.map(a=>{
+      const ca = a.performed_in_country==='CA';
+      return `<tr>
+        <td>${esc(a.output&&a.output.name||'—')}</td>
+        <td><span class="mono" style="font-size:.72rem;">${esc(a.action_type||'')}</span></td>
+        <td><span class="badge badge-${ca?'success':'info'}">${esc(a.performed_in_country||'?')}</span></td>
+        <td>${(a.costs&&a.costs.material_cad||0).toFixed(2)}</td>
+        <td>${(a.costs&&a.costs.labour_cost_cad||0).toFixed(2)}</td>
+      </tr>`;
+    }).join('')+`</tbody></table></div>`;
+
+  return html;
+}
+
+function alertBox(html,type,raw){ return '<div class="alert alert-'+type+'">'+(raw?html:esc(html))+'</div>'; }
+
+renderSamples();
+</script>
+</body>
+</html>
